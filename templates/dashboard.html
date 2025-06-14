@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дэшборд</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #6f42c1;
+            --input-border: #e2e8f0;
+            --input-focus: #c4b5fd;
+            --nav-bg: white;
+            --nav-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--nav-bg);
+            box-shadow: var(--nav-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(111, 66, 193, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .username {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: stretch;
+        }
+
+        .filters > * {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .choices {
+            width: 100% !important;
+        }
+
+        .choices__inner {
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 0.5rem !important;
+            min-height: 42px;
+            background-color: white;
+            height: 100%;
+            padding: 5px 10px !important;
+        }
+
+        .choices__list--single {
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .choices__list--dropdown {
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 0.5rem !important;
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        .choices__item {
+            padding: 5px 10px !important;
+        }
+
+        .filters button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 45px;
+            font-weight: 500;
+            font-size: 1rem;
+            align-self: stretch;
+        }
+
+        .filters button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container.full-width {
+            grid-column: 1 / -1;
+            width: 70%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chart-container h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .chart {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 400px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container.full-width {
+                width: 100%;
+                max-width: none;
+            }
+
+            .chart-container {
+                height: 700px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-wrap: wrap;
+            }
+
+            .filters > * {
+                width: 100%;
+            }
+
+            .chart-container {
+                height: 600px;
+                padding: 0.5rem;
+            }
+
+            .chart {
+                min-height: 400px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="active">Главная</a>
+                <a href="{{ url_for('forecast') }}">Прогнозирование</a>
+                <a href="{{ url_for('analytics') }}">Аналитика</a>
+                <a href="{{ url_for('compare') }}">Сравнение</a>
+                <a href="{{ url_for('reports') }}">Отчеты</a>
+<!--                <a href="{{ url_for('settings') }}">Настройки</a>-->
+            </div>
+        </div>
+        <div class="user-info">
+            <a href="{{ url_for('settings') }}" class="username">{{ current_user.username }}</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <h1>Главная</h1>
+
+        <div class="filters">
+            <select id="startYearSelect">
+                {% for year in range(2000, 2023) %}
+                    <option value="{{ year }}" {% if year == 2017 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+            <select id="endYearSelect">
+                {% for year in range(2000, 2023) %}
+                    <option value="{{ year }}" {% if year == 2022 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+            <select id="cropSelect">
+                {% for crop in crops %}
+                    <option value="{{ crop }}">{{ crop }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="updateCharts()">Применить</button>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h2>Динамика урожайности</h2>
+                <canvas id="lineChart" class="chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2 id="barChartTitle">Сравнение культур</h2>
+                <canvas id="barChart" class="chart"></canvas>
+            </div>
+            <div class="chart-container full-width">
+                <h2 id="pieChartTitle">Распределение</h2>
+                <canvas id="pieChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lineChart, barChart, pieChart;
+        let currentYearIndex = 0;
+        let years = [];
+        let autoUpdateInterval;
+        const crops = [{% for crop in crops %}"{{ crop }}",{% endfor %}];
+
+        // Пастельные цвета для культур
+        const pastelColors = [
+            "#FFB3BA", // Розовый
+            "#FFDFBA", // Оранжевый
+            "#FFFFBA", // Желтый
+            "#BAFFC9", // Зеленый
+            "#BAE1FF", // Голубой
+            "#D4A5FF", // Фиолетовый
+            "#FFB3D9", // Малиновый
+            "#B3FFD9", // Мятный
+            "#D9B3FF", // Лавандовый
+            "#FFD9B3", // Персиковый
+        ];
+
+        const startYearChoices = new Choices('#startYearSelect', {
+            searchEnabled: false,
+            itemSelectText: '',
+            shouldSort: false,
+        });
+
+        const endYearChoices = new Choices('#endYearSelect', {
+            searchEnabled: false,
+            itemSelectText: '',
+            shouldSort: false,
+        });
+
+        const cropChoices = new Choices('#cropSelect', {
+            searchEnabled: false,
+            itemSelectText: '',
+            shouldSort: false,
+        });
+
+        function initCharts() {
+            lineChart = new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Урожайность',
+                        data: [],
+                        borderColor: '#6f42c1',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            barChart = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Урожайность',
+                        data: [],
+                        backgroundColor: [] // Цвета будут заданы динамически
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            pieChart = new Chart(document.getElementById('pieChart'), {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: []
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        async function loadData() {
+            const startYear = parseInt(startYearChoices.getValue(true));
+            const endYear = parseInt(endYearChoices.getValue(true));
+            years = Array.from({length: endYear - startYear + 1}, (_, i) => startYear + i);
+            currentYearIndex = 0;
+
+            if(autoUpdateInterval) clearInterval(autoUpdateInterval);
+
+            autoUpdateInterval = setInterval(() => {
+                currentYearIndex = (currentYearIndex + 1) % years.length;
+                updateBarChartForYear(years[currentYearIndex]);
+            }, 25000);
+
+            await updateAllCharts();
+        }
+
+        async function updateBarChartForYear(year) {
+            try {
+                const response = await fetch(`/api/top_crops/${year}`);
+                const data = await response.json();
+                updateBarChart(data, year);
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        async function updateAllCharts() {
+            const crop = cropChoices.getValue(true);
+            const startYear = startYearChoices.getValue(true);
+            const endYear = endYearChoices.getValue(true);
+
+            try {
+                const lineResponse = await fetch(`/api/crop/${crop}/${startYear}/${endYear}`);
+                const lineData = await lineResponse.json();
+
+                updateLineChart(lineData, crop);
+                updatePieChart(lineData, crop);
+                updateBarChartForYear(years[currentYearIndex]);
+
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        function updateLineChart(data, crop) {
+            lineChart.data.labels = Object.keys(data);
+            lineChart.data.datasets[0].data = Object.values(data);
+            lineChart.data.datasets[0].label = `Урожайность (${crop})`;
+            lineChart.update();
+        }
+
+        function updateBarChart(data, year) {
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+
+            barChart.data.labels = labels;
+            barChart.data.datasets[0].data = values;
+            barChart.data.datasets[0].backgroundColor = labels.map((_, index) => pastelColors[index % pastelColors.length]); // Используем пастельные цвета
+            barChart.data.datasets[0].label = `Урожайность (${year})`;
+            barChart.update();
+            document.getElementById('barChartTitle').textContent = `Сравнение культур (${year})`;
+        }
+
+        function updatePieChart(data, crop) {
+            const values = Object.values(data);
+            const maxYield = Math.max(...values);
+
+            pieChart.data.labels = Object.keys(data);
+            pieChart.data.datasets[0].data = values;
+            pieChart.data.datasets[0].backgroundColor = values.map(v =>
+                `rgba(111, 66, 193, ${v/maxYield})`
+            );
+            pieChart.update();
+            document.getElementById('pieChartTitle').textContent = `Распределение (${crop})`;
+        }
+
+        window.addEventListener('resize', () => {
+            lineChart.resize();
+            barChart.resize();
+            pieChart.resize();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            loadData();
+        });
+
+        window.updateCharts = loadData;
+    </script>
+</body>
+</html>

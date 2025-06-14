@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система прогнозирования урожайности</title>
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #2d3748;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            width: 130px;
+            height: 130px;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .lead {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            color: #4a5568;
+            max-width: 600px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(111, 66, 193, 0.1);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(111, 66, 193, 0.05);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .lead {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo (1).png') }}" alt="Логотип" class="logo">
+            <h1>Прогнозирование урожайности</h1>
+            <p class="lead">
+                Государственная система мониторинга и прогнозирования
+                урожайности сельскохозяйственных культур
+            </p>
+        </div>
+
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}" class="btn btn-primary">
+                Войти в систему
+            </a>
+<!--            <a href="{{ url_for('register') }}" class="btn btn-outline">-->
+<!--                Регистрация-->
+<!--            </a>-->
+        </div>
+    </div>
+
+    <footer>
+        © 2025 Общество с ограниченной ответственностью «Национальный институт сертификации и оценки качества». Все права защищены.
+    </footer>
+</body>
+</html>

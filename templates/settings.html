@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #6f42c1;
+            --input-border: #e2e8f0;
+            --input-focus: #c4b5fd;
+            --nav-bg: white;
+            --nav-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--nav-bg);
+            box-shadow: var(--nav-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(111, 66, 193, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .username {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: none;
+
+        }
+
+        .logout-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .settings-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .settings-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .settings-form input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--input-border);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .settings-form input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--input-focus);
+        }
+
+        .settings-form button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .settings-form button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 0 1rem;
+            }
+
+            .settings-form {
+                padding: 1rem;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Главная</a>
+                <a href="{{ url_for('forecast') }}">Прогнозирование</a>
+                <a href="{{ url_for('analytics') }}">Аналитика</a>
+                <a href="{{ url_for('compare') }}">Сравнение</a>
+                <a href="{{ url_for('reports') }}">Отчеты</a>
+                <a href="{{ url_for('settings') }}" class="active">Настройки</a>
+            </div>
+        </div>
+        <div class="user-info">
+            <a href="{{ url_for('settings') }}" class="username">{{ current_user.username }}</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </nav>
+
+    <div class="settings-container">
+        <h1>Настройки</h1>
+
+        <form method="POST" class="settings-form">
+            {{ form.hidden_tag() }}
+
+            <div>
+                <label for="new_username">Новый логин</label>
+                {{ form.new_username(class="form-control") }}
+            </div>
+
+            <div>
+                <label for="new_password">Новый пароль</label>
+                {{ form.new_password(class="form-control") }}
+            </div>
+
+            <div>
+                <label for="confirm_password">Подтвердите пароль</label>
+                {{ form.confirm_password(class="form-control") }}
+            </div>
+
+            <div>
+                <label for="current_password">Текущий пароль</label>
+                {{ form.current_password(class="form-control") }}
+            </div>
+
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    </div>
+
+    <script>
+        // Инициализация Choices.js для всех select элементов
+        document.querySelectorAll('select').forEach(select => {
+            new Choices(select, {
+                searchEnabled: false,
+                itemSelectText: '',
+                shouldSort: false,
+                classNames: {
+                    containerOuter: 'choices',
+                    containerInner: 'choices__inner',
+                    input: 'choices__input',
+                    item: 'choices__item',
+                    button: 'choices__button',
+                }
+            });
+        });
+    </script>
+</body>
+</html>

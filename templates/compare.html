@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сравнение культур</title>
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #6f42c1;
+            --nav-bg: white;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--background);
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* Основная сетка */
+        .container {
+            display: grid;
+            grid-template:
+                "nav nav" auto
+                "crops chart" 1fr
+                "years years" auto
+                / 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Навигация */
+        nav {
+            grid-area: nav;
+            background: var(--nav-bg);
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(111, 66, 193, 0.05);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Блок с культурами */
+        .crops-panel {
+            grid-area: crops;
+            padding: 1rem;
+            border-right: 2px solid #eee;
+        }
+
+        /* Блок с годами */
+        .years-panel {
+            grid-area: years;
+            padding: 1rem;
+            background: white;
+            border-top: 2px solid #eee;
+        }
+
+        /* Область графика */
+        .chart-area {
+            grid-area: chart;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Заголовок */
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Стили кнопок */
+        .crop-btn, .year-btn {
+            display: block;
+            width: 100%;
+            padding: 6px 10px;
+            margin: 2px 0;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .crop-btn.active {
+            border-color: transparent;
+            color: white;
+        }
+
+        .year-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Расположение годов в 3 ряда */
+        .years-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 5px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                grid-template:
+                    "nav" auto
+                    "crops" auto
+                    "chart" 1fr
+                    "years" auto
+                    / 1fr;
+            }
+
+            .crops-panel {
+                border-right: none;
+                border-bottom: 2px solid #eee;
+            }
+
+            .years-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Навигация -->
+        <nav>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Главная</a>
+                <a href="{{ url_for('forecast') }}">Прогнозирование</a>
+                <a href="{{ url_for('analytics') }}">Аналитика</a>
+                <a href="{{ url_for('compare') }}" class="active">Сравнение</a>
+                <a href="{{ url_for('reports') }}">Отчеты</a>
+<!--                <a href="{{ url_for('settings') }}">Настройки</a>-->
+            </div>
+            <div class="user-info">
+                <span class="username">{{ current_user.username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+            </div>
+        </nav>
+
+        <!-- Панель культур -->
+        <div class="crops-panel">
+            <h1>Сравнение культур</h1>
+            <div class="crops-grid">
+                {% for crop in crops %}
+                    <button class="crop-btn"
+                            data-crop="{{ crop }}"
+                            onclick="toggleCrop('{{ crop }}')">
+                        {{ crop }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Основная область графика -->
+        <div class="chart-area">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+
+        <!-- Панель годов -->
+        <div class="years-panel">
+            <div class="years-grid">
+                {% for year in range(min_year, max_year + 1) %}
+                    <button class="year-btn"
+                            data-year="{{ year }}"
+                            onclick="toggleYear({{ year }})">
+                        {{ year }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const colorPalette = [
+            '#6f42c1', '#ff6b6b', '#4ecdc4', '#45b7d1',
+            '#96ceb4', '#ffeead', '#ff9999', '#88d8b0'
+        ];
+
+        let chart = null;
+        const selected = {
+            crops: new Map(),
+            years: new Set()
+        };
+
+        // Функция для добавления/удаления культуры
+        function toggleCrop(crop) {
+            const btn = document.querySelector(`.crop-btn[data-crop="${crop}"]`);
+
+            if (selected.crops.has(crop)) {
+                btn.classList.remove('active');
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = 'var(--primary-color)';
+                selected.crops.delete(crop);
+            } else {
+                const color = colorPalette[selected.crops.size % colorPalette.length];
+                selected.crops.set(crop, color);
+                btn.classList.add('active');
+                btn.style.backgroundColor = color;
+                btn.style.borderColor = 'transparent';
+            }
+            updateChart();
+        }
+
+        // Функция для добавления/удаления года
+        function toggleYear(year) {
+            const btn = document.querySelector(`.year-btn[data-year="${year}"]`);
+            btn.classList.toggle('active');
+            selected.years.has(year)
+                ? selected.years.delete(year)
+                : selected.years.add(year);
+            updateChart();
+        }
+
+        // Функция для обновления графика
+        async function updateChart() {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+            if (selected.crops.size === 0 || selected.years.size === 0) {
+                // Если ничего не выбрано, очищаем график
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        crops: Array.from(selected.crops.keys()),
+                        years: Array.from(selected.years).sort()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (chart) chart.destroy();
+
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: data.datasets.map((dataset, index) => ({
+                            label: dataset.label,
+                            data: dataset.data,
+                            borderColor: colorPalette[index % colorPalette.length],
+                            backgroundColor: colorPalette[index % colorPalette.length] + '20',
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Урожайность (ц/га)'
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Год'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                padding: 12
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+                alert('Ошибка при загрузке данных');
+            }
+        }
+    </script>
+</body>
+</html>

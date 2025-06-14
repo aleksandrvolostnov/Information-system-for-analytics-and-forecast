@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчеты</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #6f42c1;
+            --input-border: #e2e8f0;
+            --input-focus: #c4b5fd;
+            --nav-bg: white;
+            --nav-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--nav-bg);
+            box-shadow: var(--nav-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(111, 66, 193, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .username {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: none;
+
+        }
+
+        .logout-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Стили для формы отчетов */
+        .report-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .report-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Стили для кнопки */
+        .report-form button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 1rem;
+            height: 50px;
+            margin-top: 1rem;
+            grid-column: 1 / -1; /* Растягиваем кнопку на всю ширину */
+        }
+
+        .report-form button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-form button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Стили для Choices.js */
+        .choices {
+            width: 100% !important;
+        }
+
+        .choices__inner {
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 0.5rem !important;
+            min-height: 42px;
+            background-color: white;
+            height: 100%;
+            padding: 5px 10px !important;
+        }
+
+        .choices__list--single {
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .choices__list--dropdown {
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 0.5rem !important;
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        .choices__item {
+            padding: 5px 10px !important;
+        }
+
+        .choices__list--multiple .choices__item {
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-hover);
+            color: white;
+            border-radius: 0.25rem;
+        }
+
+        .choices__list--multiple .choices__item .choices__button {
+            border-left: 1px solid var(--primary-hover);
+        }
+
+        @media (max-width: 768px) {
+            .report-form {
+                grid-template-columns: 1fr;
+            }
+
+            .report-form button {
+                margin-top: 0;
+                height: auto;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Главная</a>
+                <a href="{{ url_for('forecast') }}">Прогнозирование</a>
+                <a href="{{ url_for('analytics') }}">Аналитика</a>
+                <a href="{{ url_for('compare') }}">Сравнение</a>
+                <a href="{{ url_for('reports') }}" class="active">Отчеты</a>
+<!--                <a href="settings">Настройки</a>-->
+            </div>
+        </div>
+        <div class="user-info">
+            <a href="{{ url_for('settings') }}" class="username">{{ current_user.username }}</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </nav>
+
+    <div class="report-container">
+        <h1>Генерация отчетов</h1>
+
+        <form method="POST" action="{{ url_for('download_report') }}" class="report-form">
+            <!-- Выбор культур -->
+            <select id="cropSelect" name="crops" multiple>
+                {% for crop in crops %}
+                    <option value="{{ crop }}">{{ crop }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Выбор года начала -->
+            <select id="startYearSelect" name="start_year">
+                {% for year in years %}
+                    <option value="{{ year }}" {% if year == 2020 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Выбор года окончания -->
+            <select id="endYearSelect" name="end_year">
+                {% for year in years %}
+                    <option value="{{ year }}" {% if year == 2028 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Кнопка -->
+            <button type="submit">Скачать отчет в Excel</button>
+        </form>
+    </div>
+
+    <script>
+        // Инициализация Choices.js для выбора культур
+        const cropChoices = new Choices('#cropSelect', {
+            removeItemButton: true,
+            searchEnabled: true,
+            placeholder: true,
+            itemSelectText: '',
+            classNames: {
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
+                input: 'choices__input',
+                item: 'choices__item',
+                button: 'choices__button',
+            }
+        });
+
+        // Инициализация Choices.js для выбора года начала
+        const startYearChoices = new Choices('#startYearSelect', {
+            searchEnabled: false,
+            itemSelectText: '',
+            classNames: {
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
+                input: 'choices__input',
+                item: 'choices__item',
+                button: 'choices__button',
+            }
+        });
+
+        // Инициализация Choices.js для выбора года окончания
+        const endYearChoices = new Choices('#endYearSelect', {
+            searchEnabled: false,
+            itemSelectText: '',
+            classNames: {
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
+                input: 'choices__input',
+                item: 'choices__item',
+                button: 'choices__button',
+            }
+        });
+    </script>
+</body>
+</html>

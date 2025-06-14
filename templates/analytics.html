@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сравнительная аналитика</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --primary-hover: #5e3aa3;
+            --background: #f8f9fa;
+            --text-color: #6f42c1;
+            --input-border: #e2e8f0;
+            --input-focus: #c4b5fd;
+            --nav-bg: white;
+            --nav-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--nav-bg);
+            box-shadow: var(--nav-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(111, 66, 193, 0.05);
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .username {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: none;
+
+        }
+
+        .logout-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .analytics-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .comparison-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: flex-end;
+        }
+
+        .year-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .year-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 0.5rem;
+            background: white;
+            color: var(--text-color);
+        }
+
+        .multi-select .choices__inner {
+            min-height: 45px;
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .comparison-chart {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: 600px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 45px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-form {
+                grid-template-columns: 1fr;
+            }
+
+            .year-range {
+                flex-direction: column;
+            }
+
+            .comparison-chart {
+                height: 400px;
+                padding: 1rem;
+            }
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            padding: 8px 12px;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .legend-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .legend-item.active {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .legend-item .remove-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Главная</a>
+                <a href="{{ url_for('forecast') }}">Прогнозирование</a>
+                <a href="{{ url_for('analytics') }}" class="active">Аналитика</a>
+                <a href="{{ url_for('compare') }}">Сравнение</a>
+                <a href="{{ url_for('reports') }}">Отчеты</a>
+<!--                <a href="{{ url_for('settings') }}">Настройки</a>-->
+            </div>
+        </div>
+        <div class="user-info">
+            <a href="{{ url_for('settings') }}" class="username">{{ current_user.username }}</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+        </div>
+    </nav>
+
+    <div class="analytics-container">
+        <h1>Анализ урожайности</h1>
+
+        <!-- Легенда -->
+        <div class="legend" id="legend">
+            {% for crop in crops %}
+                <div class="legend-item" data-crop="{{ crop }}">
+                    {{ crop }}
+                    <button class="remove-btn" onclick="removeCrop('{{ crop }}')">×</button>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- График -->
+        <div class="comparison-chart">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Цветовая палитра
+        
+
+        let comparisonChart = null;
+        const addedCrops = new Set(); // Храним добавленные культуры
+
+        // Инициализация графика
+        function initChart() {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    comparisonChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: []
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index', // Показывать tooltip для всех линий на одном уровне по оси X
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Урожайность (ц/га)'
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Год'
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Скрываем стандартную легенду
+                },
+                tooltip: {
+                    enabled: true, // Включаем tooltips
+                    mode: 'index', // Показывать данные для всех линий на одном уровне по оси X
+                    intersect: false, // Не требовать точного наведения на линию
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Цвет фона tooltip
+                    titleColor: '#ffffff', // Цвет заголовка
+                    bodyColor: '#ffffff', // Цвет текста
+                    borderColor: 'rgba(255, 255, 255, 0.1)', // Цвет границы
+                    borderWidth: 1, // Толщина границы
+                    padding: 12, // Отступы внутри tooltip
+                    callbacks: {
+                        title: (context) => {
+                            // Заголовок tooltip (год)
+                            return `Год: ${context[0].label}`;
+                        },
+                        label: (context) => {
+                            // Текст для каждой линии
+                            const label = context.dataset.label || '';
+                            const value = context.raw || 0;
+                            return `${label}: ${value} ц/га`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+        }
+
+        // Добавление культуры на график
+        async function addCrop(crop) {
+    if (addedCrops.has(crop)) return; // Если культура уже добавлена, выходим
+
+    try {
+        const response = await fetch(`/api/crop/${crop}`);
+        const data = await response.json();
+
+        if (data) {
+            const years = Object.keys(data).map(Number);
+            const values = Object.values(data).map(Number);
+
+            // Генерируем уникальный цвет для культуры
+            const color = getColor(addedCrops.size);
+
+            // Добавляем данные на график
+            comparisonChart.data.labels = years;
+            comparisonChart.data.datasets.push({
+                label: crop,
+                data: values,
+                borderColor: color, // Уникальный цвет для линии
+                backgroundColor: color + '20', // Полупрозрачный фон для области под линией
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5
+            });
+
+            addedCrops.add(crop); // Добавляем культуру в набор
+            comparisonChart.update(); // Обновляем график
+
+            // Делаем элемент легенды активным
+            const legendItem = document.querySelector(`.legend-item[data-crop="${crop}"]`);
+            if (legendItem) {
+                legendItem.classList.add('active');
+                legendItem.style.backgroundColor = color; // Устанавливаем цвет легенды
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        alert('Ошибка при загрузке данных');
+    }
+}
+
+        // Удаление культуры с графика
+        function removeCrop(crop) {
+    if (!addedCrops.has(crop)) return; // Если культура не добавлена, выходим
+
+    // Удаляем культуру из графика
+    const datasetIndex = comparisonChart.data.datasets.findIndex(ds => ds.label === crop);
+    if (datasetIndex !== -1) {
+        comparisonChart.data.datasets.splice(datasetIndex, 1);
+        comparisonChart.update();
+    }
+
+    addedCrops.delete(crop); // Удаляем культуру из набора
+
+    // Убираем активный стиль у элемента легенды
+    const legendItem = document.querySelector(`.legend-item[data-crop="${crop}"]`);
+    if (legendItem) {
+        legendItem.classList.remove('active');
+        legendItem.style.backgroundColor = '#f0f0f0'; // Возвращаем стандартный цвет
+    }
+}
+
+        // Обработка кликов по легенде
+document.getElementById('legend').addEventListener('click', (event) => {
+    const legendItem = event.target.closest('.legend-item');
+    if (legendItem) {
+        const crop = legendItem.getAttribute('data-crop');
+        if (addedCrops.has(crop)) {
+            removeCrop(crop);
+        } else {
+            addCrop(crop);
+        }
+    }
+});
+        function getColor(index) {
+    const colors = [
+        '#6f42c1', '#ff6b6b', '#4ecdc4', '#45b7d1',
+        '#96ceb4', '#ffeead', '#ff9999', '#88d8b0',
+        '#ffcc99', '#99ccff', '#cc99ff', '#ff99cc',
+        '#99ffcc', '#ccff99', '#ffcc66', '#66ccff'
+    ];
+    return colors[index % colors.length]; // Используем модуль для циклического выбора цветов
+}
+        // Инициализация графика при загрузке страницы
+        initChart();
+    </script>
+</body>
+</html>
